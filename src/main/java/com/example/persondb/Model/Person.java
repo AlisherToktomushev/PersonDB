@@ -1,5 +1,6 @@
 package com.example.persondb.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class Person {
     private int age;
     private String job;
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<News> personNewsList = new ArrayList<>();
 
 }

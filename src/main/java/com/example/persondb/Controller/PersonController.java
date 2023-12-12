@@ -1,4 +1,5 @@
 package com.example.persondb.Controller;
+import com.example.persondb.Model.News;
 import com.example.persondb.repository.CategoryRepository;
 import com.example.persondb.repository.NewsRepository;
 import com.example.persondb.Model.Person;
@@ -9,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class PersonController {
@@ -25,6 +24,10 @@ public class PersonController {
 
     public PersonController(PersonService personService) {
         this.personService = personService;
+    }
+    @GetMapping("/getNews")
+    public Iterable<News> getAllNews(){
+        return newsRepository.findAll();
     }
 
 
