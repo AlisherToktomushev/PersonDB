@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class PersonService {
@@ -27,7 +28,6 @@ public class PersonService {
     public void addPersonWithNews(PersonWithNewsDto personWithNewsDto) {
         Category category = personWithNewsDto.getCategory();
         Category parentCategory = personWithNewsDto.getParentCategory();
-
 
         if (parentCategory != null) {
             categoryRepository.save(parentCategory);
