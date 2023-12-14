@@ -6,6 +6,7 @@ import com.example.persondb.Model.Person;
 import com.example.persondb.repository.PersonRepository;
 import com.example.persondb.service.PersonService;
 import com.example.persondb.service.PersonWithNewsDto;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +58,9 @@ public class PersonController {
     public ResponseEntity<Person> update2Person(@PathVariable int personId, @RequestBody Person updatedPerson) {
         logger.info("Обновление человека {}", personId);
         Person person = personService.getPersonById(personId);
-        try {
         if (person == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception e){
-           logger.error("ошибка не найден person",e);
-        }
+          throw new IllegalArgumentException("не найден");
+
         person.setName(updatedPerson.getName());
         person.setAge(updatedPerson.getAge());
         person.setJob(updatedPerson.getJob());
@@ -73,28 +71,25 @@ public class PersonController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addPersonWithNews(@RequestBody PersonWithNewsDto personWithNewsDto) {
-        try {
-            logger.info("добавление человека");
-            personService.addPersonWithNews(personWithNewsDto);
-            return ResponseEntity.ok("Added successfully");
-        } catch (Exception e) {
-            logger.error("ошибка при ввода человека", e);
+           if (personWithNewsDto!=null) {
+               logger.info("добавление человека");
+               personService.addPersonWithNews(personWithNewsDto);
+               return ResponseEntity.ok("Added successfully");
+           }else
+            logger.error("ошибка при ввода человека", personWithNewsDto);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ошибка");
-        }
+
     }
     @GetMapping("/personId{id}")
     public ResponseEntity<Person> getPersonById(@PathVariable int id) {
         try {
-            logger.info("вывод человека по id {}", id);
-            Person person = personRepository.findById(id).orElse(null);
+            logger.info("Fetching person with ID {}", id);
+            Person person = personRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Person не найден по ID: " + id));
 
-            if (person != null) {
-                return new ResponseEntity<>(person, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(person, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("ошибка при вывода человека по  {}", id, e);
+            logger.error("Person не найден {}", id, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
